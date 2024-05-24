@@ -11,7 +11,7 @@ import { DealService } from '../deal.service';
 import { DealMonitor } from './monitor';
 
 @Injectable()
-@WebSocketGateway(4225, {
+@WebSocketGateway({
   cors: true,
 })
 export class MonitorGateway {

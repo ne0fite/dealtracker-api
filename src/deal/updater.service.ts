@@ -1,5 +1,5 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
-import { Cron, CronExpression } from '@nestjs/schedule';
+import { Cron } from '@nestjs/schedule';
 import { Op } from 'sequelize';
 
 import * as Constants from '../constants';
@@ -8,12 +8,13 @@ import { ApiService } from '../alphavantage/api.service';
 import Deal from 'src/models/deal';
 import { CoinbaseService } from 'src/coinbase/coinbase.service';
 
+const ENABLE_UPDATER = process.env.ENABLE_UPDATER === 'true';
+
 @Injectable()
 export class UpdaterService {
   static SupportedCryptoSymbols = new Map(Object.entries(CryptoSymbols));
 
   static schedule = '*/5 * * * * *';
-  // static schedule = CronExpression.EVERY_MINUTE;
 
   private readonly logger = new Logger(UpdaterService.name);
 
@@ -26,7 +27,7 @@ export class UpdaterService {
 
   @Cron(UpdaterService.schedule, {
     name: 'deal updater',
-    // disabled: true,
+    disabled: !ENABLE_UPDATER,
   })
   async updateDeals() {
     const openDeals = await this.dealRepository.findAll({

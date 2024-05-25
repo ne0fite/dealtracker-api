@@ -1,9 +1,9 @@
 {
-  "name": "nest-typescript-starter",
+  "name": "dealtracker",
   "private": true,
   "version": "1.0.0",
-  "description": "Nest TypeScript starter repository",
-  "license": "MIT",
+  "description": "DealTracker",
+  "license": "None",
   "scripts": {
     "build": "nest build",
     "deploy": "npm ci && npm run build && npm run start:prod",

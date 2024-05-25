@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  server:
+    image: dealtracker-api
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_NAME=dealtracker
+      - DB_USER=dealtracker
+      - DB_PASS=password
+    depends_on:
+      - db
+
+  db:
+    image: postgres:16
+    ports:
+        - 5433:5432
+    environment:
+      POSTGRES_USER: dealtracker
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: dealtracker
+    volumes:
+      - /Users/swamsley/data/dealtracker:/var/lib/postgresql/data
+
+networks:
+  default:
+    driver: bridge

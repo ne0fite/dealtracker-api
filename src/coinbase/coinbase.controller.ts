@@ -6,6 +6,14 @@ import { Ticker } from 'src/common/coinbase/types';
 export class CoinbaseController {
   constructor(private coinbaseService: CoinbaseService) {}
 
+  @Get('auth/token')
+  getAuthToken() {
+    const token = this.coinbaseService.createAuthToken();
+    return {
+      token,
+    };
+  }
+
   @Get('product/trading-pairs')
   async getKnownTradingPairs() {
     return this.coinbaseService.getKnownTradingPairs();

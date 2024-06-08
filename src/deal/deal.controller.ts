@@ -13,9 +13,10 @@ import {
 import Deal from '../models/deal';
 import { DealService } from './deal.service';
 import { DealDto } from '../common/types/deal.dto';
-import { DealQuery, FindDealResponse } from '../common/types';
+import { FindDealResponse } from '../common/types';
 import { DealStats } from 'src/common/types/deal-stats';
 import { AuthGuard } from 'src/auth/auth.guard';
+import { QueryInterface } from 'src/sequelize-options-builder';
 
 @Controller('/api/v1/deal')
 @UseGuards(AuthGuard)
@@ -23,7 +24,7 @@ export class DealController {
   constructor(private dealService: DealService) {}
 
   @Get('')
-  async find(@Query() query: DealQuery): Promise<FindDealResponse> {
+  async find(@Query() query: QueryInterface): Promise<FindDealResponse> {
     const results = await this.dealService.findAll(query);
 
     return {
@@ -33,7 +34,7 @@ export class DealController {
   }
 
   @Get('stats')
-  async getStats(@Query() query: DealQuery): Promise<DealStats> {
+  async getStats(@Query() query: QueryInterface): Promise<DealStats> {
     return this.dealService.getStats(query);
   }
 

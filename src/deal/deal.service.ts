@@ -1,14 +1,16 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { Op } from 'sequelize';
 
 import { DealDto } from '../common/types/deal.dto';
 
 import * as Constants from '../constants';
 import Deal from '../models/deal';
 import { calculateDeal } from '../common/calculator';
-import { DealQuery } from '../common/types';
 import { DealStats } from '../common/types/deal-stats';
-import { FindOptions } from 'sequelize';
+import {
+  QueryInterface,
+  SequelizeOptionsBuilder,
+} from 'src/sequelize-options-builder';
+import { Literal } from 'sequelize/types/utils';
 
 @Injectable()
 export class DealService {
@@ -17,61 +19,42 @@ export class DealService {
     private dealRepository: typeof Deal,
   ) {}
 
-  addFilters(query, where) {
-    if (query?.filter?.filters) {
-      for (const filter of query.filter.filters) {
-        if (filter.status) {
-          where['status'] = {
-            [Op.eq]: filter.status,
-          };
-        }
-      }
-    }
-  }
+  findAll(query: QueryInterface): Promise<Deal[]> {
+    const sequelize = this.dealRepository.sequelize;
+    const optionsBuilder = new SequelizeOptionsBuilder<Deal>(sequelize);
 
-  findAll(query: DealQuery): Promise<Deal[]> {
-    const options: FindOptions = {
-      where: {},
-      order: [
-        ['openDate', 'desc'],
-        ['createdAt', 'desc'],
-      ],
-    };
-
-    this.addFilters(query, options.where);
+    const options = optionsBuilder.build(query);
 
     return this.dealRepository.findAll<Deal>(options);
   }
 
-  getStats(query: DealQuery): Promise<DealStats> {
+  getStats(query: QueryInterface): Promise<DealStats> {
     const sequelize = this.dealRepository.sequelize;
+    const optionsBuilder = new SequelizeOptionsBuilder<Deal>(sequelize);
 
-    const options: FindOptions = {
-      attributes: [
-        [
-          sequelize.literal('sum(case when profit_loss > 0 then 1 else 0 end)'),
-          'wins',
-        ],
-        [
-          sequelize.literal(
-            'sum(case when profit_loss <= 0 then 1 else 0 end)',
-          ),
-          'losses',
-        ],
-        [sequelize.literal('sum(profit_loss)'), 'totalProfitLoss'],
-        [
-          sequelize.literal('sum(profit_loss) / sum(close_cost_basis)'),
-          'totalProfitPercent',
-        ],
-        [
-          sequelize.literal('sum(profit_loss) / sum(take_profit_amount) * 100'),
-          'totalProgress',
-        ],
+    const options = optionsBuilder.build(query);
+
+    const aggregateAttributes: [Literal, string][] = [
+      [
+        sequelize.literal('sum(case when profit_loss > 0 then 1 else 0 end)'),
+        'wins',
       ],
-      where: {},
-    };
+      [
+        sequelize.literal('sum(case when profit_loss <= 0 then 1 else 0 end)'),
+        'losses',
+      ],
+      [sequelize.literal('sum(profit_loss)'), 'totalProfitLoss'],
+      [
+        sequelize.literal('sum(profit_loss) / sum(close_cost_basis)'),
+        'totalProfitPercent',
+      ],
+      [
+        sequelize.literal('sum(profit_loss) / sum(take_profit_amount) * 100'),
+        'totalProgress',
+      ],
+    ];
 
-    this.addFilters(query, options.where);
+    options.attributes = aggregateAttributes;
 
     return this.dealRepository.findOne<any>(options);
   }

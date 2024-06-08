@@ -9,7 +9,7 @@ export class ApiService {
   /**
    * @TODO extract to config/env
    */
-  static API_KEY = 'MLU0C8WGUOPJ3BON';
+  static API_KEY = process.env.AV_API_KEY;
 
   static API_BASE_URL = 'https://www.alphavantage.co/query';
 

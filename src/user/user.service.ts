@@ -15,4 +15,8 @@ export class UserService {
       },
     });
   }
+
+  async getById(id: string): Promise<User | undefined> {
+    return this.userRepository.findByPk(id);
+  }
 }

@@ -8,9 +8,10 @@ import { DealService } from './deal.service';
 import { MonitorGateway } from './monitor/monitor.gateway';
 import { UpdaterService } from './updater.service';
 import { CoinbaseModule } from 'src/coinbase/coinbase.module';
+import { UserModule } from 'src/user/user.module';
 
 @Module({
-  imports: [DatabaseModule, AlphavantageModule, CoinbaseModule],
+  imports: [DatabaseModule, AlphavantageModule, CoinbaseModule, UserModule],
   controllers: [DealController],
   providers: [DealService, ...dealProviders, UpdaterService, MonitorGateway],
 })

@@ -11,6 +11,7 @@ import { Reflector } from '@nestjs/core';
 
 import { jwtConstants } from './constants';
 import { IS_PUBLIC_KEY } from './meta';
+import { UserService } from 'src/user/user.service';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -19,6 +20,7 @@ export class AuthGuard implements CanActivate {
   constructor(
     private jwtService: JwtService,
     private reflector: Reflector,
+    private userService: UserService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -41,9 +43,14 @@ export class AuthGuard implements CanActivate {
       const payload = await this.jwtService.verifyAsync(token, {
         secret: jwtConstants.secret,
       });
-      // 💡 We're assigning the payload to the request object here
-      // so that we can access it in our route handlers
-      request['user'] = payload;
+
+      const user = await this.userService.getById(payload.sub);
+
+      if (user == null) {
+        throw new UnauthorizedException('Invalid Auth Token');
+      }
+
+      request['user'] = user;
     } catch (error) {
       this.logger.warn('Token found in request failed to verify');
       console.error(error);

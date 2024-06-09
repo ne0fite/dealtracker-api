@@ -5,19 +5,14 @@ import {
   Model,
   CreatedAt,
   UpdatedAt,
-  HasMany,
-  ForeignKey,
 } from 'sequelize-typescript';
-
-import Deal from './deal';
-import Account from './account';
 
 @Table({
   timestamps: true,
   underscored: true,
-  tableName: 'project',
+  tableName: 'account',
 })
-export default class Project extends Model {
+export default class Account extends Model {
   @Column({
     primaryKey: true,
     type: DataType.UUID,
@@ -25,28 +20,18 @@ export default class Project extends Model {
   })
   id: string;
 
-  @ForeignKey(() => Account)
-  @Column(DataType.UUID)
-  accountId: string;
+  @Column(DataType.TEXT)
+  firstName: string;
 
   @Column(DataType.TEXT)
-  name: string;
-
-  @Column(DataType.DOUBLE)
-  goal: number = 0;
+  lastName: string;
 
   @Column(DataType.TEXT)
-  strategy: string;
-
-  @Column(DataType.TEXT)
-  notes: string;
+  csToken: string;
 
   @CreatedAt
   createdAt: Date;
 
   @UpdatedAt
   updatedAt: Date;
-
-  @HasMany(() => Deal)
-  deals: Deal[];
 }

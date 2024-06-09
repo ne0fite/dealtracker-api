@@ -4,11 +4,12 @@ import {
   SubscribeMessage,
   WebSocketGateway,
 } from '@nestjs/websockets';
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, Request } from '@nestjs/common';
 import { Socket } from 'net';
 
 import { DealService } from '../deal.service';
 import { DealMonitor } from './monitor';
+import User from 'src/models/user';
 
 @Injectable()
 @WebSocketGateway({
@@ -25,10 +26,13 @@ export class MonitorGateway {
   subscribeMonitorDeal(
     @MessageBody('id') id: string,
     @ConnectedSocket() client: Socket,
+    @Request() request,
   ) {
+    const user: User = request['user'];
+
     this.logger.debug(`Start monitoring deal ${id}`);
 
-    this.monitorDeal(id, client);
+    this.monitorDeal(id, user.accountId, client);
 
     return { status: 'OK' };
   }
@@ -42,12 +46,18 @@ export class MonitorGateway {
     return { status: 'OK' };
   }
 
-  monitorDeal(id, client): void {
+  monitorDeal(id, accountId, client): void {
     if (this.monitors.has(id)) {
       this.logger.debug(`Monitor already started for deal ${id}`);
     }
 
-    const monitor = new DealMonitor(id, this.dealService, client, this.logger);
+    const monitor = new DealMonitor(
+      id,
+      accountId,
+      this.dealService,
+      client,
+      this.logger,
+    );
 
     monitor.start().catch((error) => {
       this.logger.error(

@@ -8,6 +8,7 @@ import {
   ForeignKey,
 } from 'sequelize-typescript';
 
+import Account from './account';
 import Project from './project';
 
 /**
@@ -26,11 +27,16 @@ export default class Deal extends Model {
   })
   id: string;
 
+  @ForeignKey(() => Account)
+  @Column(DataType.UUID)
+  accountId: string;
+
   /**
    * Option project for the Deal.
    */
   @ForeignKey(() => Project)
-  project: Project;
+  @Column(DataType.UUID)
+  projectId: string;
 
   /**
    * Deal status.

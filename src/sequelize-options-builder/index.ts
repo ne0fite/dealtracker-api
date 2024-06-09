@@ -40,9 +40,11 @@ export interface QueryInterface {
 
 export class SequelizeOptionsBuilder<M extends Model> {
   private sequelize!: Sequelize;
+  private accountId: string;
 
-  constructor(sequelize: Sequelize) {
+  constructor(sequelize: Sequelize, accountId: string) {
     this.sequelize = sequelize;
+    this.accountId = accountId;
   }
 
   build(query: QueryInterface) {
@@ -59,7 +61,11 @@ export class SequelizeOptionsBuilder<M extends Model> {
       bucketField,
     } = query;
 
-    const options: FindOptions = {};
+    const options: FindOptions = {
+      where: {
+        accountId: this.accountId,
+      },
+    };
 
     const attributes: Attributes<M>[] = queryAttributes;
 
@@ -80,8 +86,6 @@ export class SequelizeOptionsBuilder<M extends Model> {
     }
 
     if (filter && filter.filters) {
-      options.where = {};
-
       for (const filterItem of filter.filters) {
         if (!options.where[filterItem.field]) {
           options.where[filterItem.field] = {};

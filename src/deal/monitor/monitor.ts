@@ -14,13 +14,14 @@ export class DealMonitor {
 
   constructor(
     private dealId: string,
+    private accountId: string,
     private dealService: DealService,
     private client: Socket,
     private logger: LoggerService,
   ) {}
 
   async start() {
-    const deal = await this.dealService.getById(this.dealId);
+    const deal = await this.dealService.getById(this.dealId, this.accountId);
     if (!deal) {
       throw new WsException('Deal Not Found');
     }

@@ -27,7 +27,7 @@ export const databaseProviders = [
         logging: false,
       });
       sequelize.addModels([__dirname + '/../models']);
-      // await sequelize.sync();
+      await sequelize.sync();
       return sequelize;
     },
   },

@@ -1,10 +1,24 @@
+CREATE TABLE account (
+    id uuid PRIMARY KEY,
+    first_name text,
+    last_name text,
+    cs_token text,
+    created_at timestamp with time zone NOT NULL,
+    updated_at timestamp with time zone NOT NULL
+);
+
+CREATE UNIQUE INDEX account_pkey ON account(id uuid_ops);
+
 CREATE TABLE "user" (
     id uuid PRIMARY KEY,
     email text,
     password text,
     created_at timestamp with time zone NOT NULL,
-    updated_at timestamp with time zone NOT NULL
+    updated_at timestamp with time zone NOT NULL,
+    account_id uuid REFERENCES account(id) ON DELETE CASCADE
 );
+
+CREATE UNIQUE INDEX user_pkey ON "user"(id uuid_ops);
 
 CREATE TABLE coinbase_product (
     id uuid PRIMARY KEY,
@@ -32,8 +46,11 @@ CREATE TABLE project (
     strategy text,
     notes text,
     created_at timestamp with time zone NOT NULL,
-    updated_at timestamp with time zone NOT NULL
+    updated_at timestamp with time zone NOT NULL,
+    account_id uuid REFERENCES account(id) ON DELETE CASCADE
 );
+
+CREATE UNIQUE INDEX project_pkey ON project(id uuid_ops);
 
 CREATE TABLE deal (
     id uuid PRIMARY KEY,
@@ -69,6 +86,9 @@ CREATE TABLE deal (
     profit_loss double precision,
     created_at timestamp with time zone NOT NULL,
     updated_at timestamp with time zone NOT NULL,
-    project uuid REFERENCES project(id) ON DELETE SET NULL ON UPDATE CASCADE,
-    notes text
+    project_id uuid REFERENCES project(id) ON DELETE SET NULL ON UPDATE CASCADE,
+    notes text,
+    account_id uuid REFERENCES account(id) ON DELETE CASCADE
 );
+
+CREATE UNIQUE INDEX deal_pkey ON deal(id uuid_ops);

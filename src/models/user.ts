@@ -5,7 +5,9 @@ import {
   Model,
   CreatedAt,
   UpdatedAt,
+  ForeignKey,
 } from 'sequelize-typescript';
+import Account from './account';
 
 @Table({
   timestamps: true,
@@ -19,6 +21,10 @@ export default class User extends Model {
     defaultValue: DataType.UUIDV1,
   })
   id: string;
+
+  @ForeignKey(() => Account)
+  @Column(DataType.UUID)
+  accountId: string;
 
   @Column(DataType.TEXT)
   email: string;

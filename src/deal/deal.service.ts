@@ -19,18 +19,24 @@ export class DealService {
     private dealRepository: typeof Deal,
   ) {}
 
-  findAll(query: QueryInterface): Promise<Deal[]> {
+  findAll(query: QueryInterface, accountId: string): Promise<Deal[]> {
     const sequelize = this.dealRepository.sequelize;
-    const optionsBuilder = new SequelizeOptionsBuilder<Deal>(sequelize);
+    const optionsBuilder = new SequelizeOptionsBuilder<Deal>(
+      sequelize,
+      accountId,
+    );
 
     const options = optionsBuilder.build(query);
 
     return this.dealRepository.findAll<Deal>(options);
   }
 
-  getStats(query: QueryInterface): Promise<DealStats> {
+  getStats(query: QueryInterface, accountId: string): Promise<DealStats> {
     const sequelize = this.dealRepository.sequelize;
-    const optionsBuilder = new SequelizeOptionsBuilder<Deal>(sequelize);
+    const optionsBuilder = new SequelizeOptionsBuilder<Deal>(
+      sequelize,
+      accountId,
+    );
 
     const options = optionsBuilder.build(query);
 
@@ -59,13 +65,19 @@ export class DealService {
     return this.dealRepository.findOne<any>(options);
   }
 
-  getById(id: string): Promise<Deal> {
-    return this.dealRepository.findByPk(id);
+  getById(id: string, accountId: string): Promise<Deal> {
+    return this.dealRepository.findOne({
+      where: {
+        id,
+        accountId,
+      },
+    });
   }
 
-  async create(createDealDto: DealDto): Promise<Deal> {
+  async create(createDealDto: DealDto, accountId: string): Promise<Deal> {
     const deal = new Deal();
 
+    deal.accountId = accountId;
     deal.set(createDealDto);
 
     this.calculate(deal);

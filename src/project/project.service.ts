@@ -8,11 +8,20 @@ export class ProjectService {
     private projectRepository: typeof Project,
   ) {}
 
-  findAll(): Promise<Project[]> {
-    return this.projectRepository.findAll<Project>();
+  findAll(accountId: string): Promise<Project[]> {
+    return this.projectRepository.findAll<Project>({
+      where: {
+        accountId,
+      },
+    });
   }
 
-  getById(id: string): Promise<Project> {
-    return this.projectRepository.findByPk(id);
+  getById(id: string, accountId: string): Promise<Project> {
+    return this.projectRepository.findOne({
+      where: {
+        id,
+        accountId,
+      },
+    });
   }
 }

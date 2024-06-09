@@ -35,6 +35,7 @@ export interface QueryInterface {
   take?: number;
   offset?: number;
   bucket?: string;
+  bucketField?: string;
 }
 
 export class SequelizeOptionsBuilder<M extends Model> {
@@ -55,6 +56,7 @@ export class SequelizeOptionsBuilder<M extends Model> {
       group = [],
       sort = [],
       bucket,
+      bucketField,
     } = query;
 
     const options: FindOptions = {};
@@ -136,9 +138,13 @@ export class SequelizeOptionsBuilder<M extends Model> {
       options.order = sort.map((sortItem) => [sortItem.field, sortItem.dir]);
     }
 
-    if (bucket) {
+    if (bucket && bucketField) {
       attributes.push([
-        this.sequelize.fn('date_trunc', bucket, this.sequelize.col('date')),
+        this.sequelize.fn(
+          'date_trunc',
+          bucket,
+          this.sequelize.col(bucketField),
+        ),
         'bucket',
       ]);
       options.group = ['bucket'];
